@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#142b45"><title>CIVIL MATERIAL CALCULATOR V2.0</title>
+<style>
+:root{--navy:#142b45;--blue:#2463a6;--bg:#f3f6fa;--line:#dce4ed;--muted:#64748b}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);font-family:Arial,"Noto Sans Bengali",sans-serif;color:#182433}
+header{background:linear-gradient(120deg,#10243a,#24527d);color:#fff;padding:22px 16px}header h1{font-size:22px;margin:0 0 5px}header p{margin:0;color:#d5e4f4;font-size:13px}
+main{max-width:1000px;margin:18px auto;padding:0 12px 30px}
+.panel{background:#fff;border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:14px;box-shadow:0 3px 12px #142b450c}
+h2{font-size:18px;margin:0 0 14px;color:var(--navy)}h3{font-size:15px;margin:16px 0 9px;color:var(--navy)}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+label{display:block;font-size:13px;font-weight:bold;margin-bottom:5px;color:#334155}
+input,select{width:100%;padding:11px;border:1px solid #cbd5e1;border-radius:8px;font-size:16px;background:#fff;color:#142033}
+small,.hint{color:var(--muted);font-size:12px;line-height:1.5}
+button{border:0;border-radius:9px;padding:12px 15px;background:var(--blue);color:white;font-weight:bold;font-size:14px;cursor:pointer}
+button.secondary{background:#e8eef5;color:var(--navy)}button.danger{background:#9b3030}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+.tabs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-bottom:14px}
+.tab{background:white;color:var(--navy);border:1px solid var(--line);padding:12px 5px}.tab.active{background:var(--navy);color:white}
+.result{background:#f0f6fc;border:1px solid #d6e6f5;border-radius:12px;padding:14px;margin-top:14px}
+.metrics{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.metric{background:#fff;border:1px solid var(--line);border-radius:9px;padding:11px}
+.metric span{display:block;color:var(--muted);font-size:12px}.metric strong{display:block;font-size:20px;margin-top:4px;color:#14518b;overflow-wrap:anywhere}
+table{width:100%;border-collapse:collapse;margin-top:10px;font-size:14px}td,th{padding:9px;border-bottom:1px solid var(--line);text-align:left}th{color:var(--muted);font-size:12px}
+.hidden{display:none}.opening{border:1px dashed #aab9ca;padding:12px;border-radius:10px;margin-top:10px}
+.total{font-size:22px;font-weight:bold;color:#12603a}.footer{font-size:11px;color:#64748b;line-height:1.6;margin:14px 2px}
+@media(max-width:600px){.grid{grid-template-columns:1fr}.tabs{grid-template-columns:repeat(2,minmax(0,1fr))}.metrics{grid-template-columns:1fr 1fr}header h1{font-size:19px}.panel{padding:13px}}
+@media print{header,.tabs,.actions,.no-print{display:none!important}body{background:white}main{margin:0;max-width:none}.panel{box-shadow:none;break-inside:avoid}}
+</style></head>
+<body>
+<header><h1>🏗️ CIVIL MATERIAL CALCULATOR V2.0</h1><p>Wall • Road • PCC • RCC Slab • Column • Beam • Footing</p></header>
+<main>
+<div class="tabs no-print">
+<button class="tab active" data-kind="wall" onclick="switchKind('wall')">🧱 Wall</button>
+<button class="tab" data-kind="road" onclick="switchKind('road')">🛣️ Road</button>
+<button class="tab" data-kind="pcc" onclick="switchKind('pcc')">PCC</button>
+<button class="tab" data-kind="slab" onclick="switchKind('slab')">RCC Slab</button>
+<button class="tab" data-kind="column" onclick="switchKind('column')">Column</button>
+<button class="tab" data-kind="beam" onclick="switchKind('beam')">Beam</button>
+<button class="tab" data-kind="footing" onclick="switchKind('footing')">Footing</button>
+</div>
+
+<section id="wall" class="kind">
+<div class="panel"><h2>ইটের দেওয়ালের হিসাব</h2>
+<div class="grid">
+<div><label>উচ্চতা (ফুট)</label><input id="wh" type="number" value="10" min="0" step="any"></div>
+<div><label>দৈর্ঘ্য (ফুট)</label><input id="wl" type="number" value="20" min="0" step="any"></div>
+<div><label>পুরুত্ব</label><select id="wt"><option value="4.5">৪.৫ ইঞ্চি</option><option value="9" selected>৯ ইঞ্চি</option><option value="13.5">১৩.৫ ইঞ্চি</option></select></div>
+<div><label>মশলার অনুপাত</label><select id="wm"><option>1:4</option><option>1:5</option><option selected>1:6</option></select></div>
+</div>
+<h3>দরজা / জানালা বাদ দিন</h3><div class="hint">প্রতিটি opening-এর প্রস্থ, উচ্চতা ও সংখ্যা দিন।</div><div id="openings"></div>
+<div class="actions no-print"><button class="secondary" onclick="addOpening()">＋ Opening যোগ করুন</button></div>
+<div class="grid" style="margin-top:12px">
+<div><label>ইটের অপচয় (%)</label><input id="bwaste" type="number" value="5" min="0"></div>
+<div><label>মশলার অপচয় (%)</label><input id="mwaste" type="number" value="5" min="0"></div>
+<div><label>প্রতি ১০০০ ইটের দাম (₹)</label><input id="brickRate" type="number" value="9000" min="0"></div>
+<div><label>সিমেন্ট ব্যাগের দাম (₹)</label><input id="cementRateW" type="number" value="400" min="0"></div>
+<div><label>বালি প্রতি CFT (₹)</label><input id="sandRateW" type="number" value="55" min="0"></div>
+</div><div class="actions no-print"><button onclick="calcWall()">হিসাব করুন</button><button class="secondary" onclick="resetWall()">Reset</button></div><div id="wallResult" class="result hidden"></div>
+</div></section>
+
+<section id="concrete" class="kind hidden">
+<div class="panel"><h2 id="concreteTitle">কংক্রিটের হিসাব</h2><p class="hint" id="concreteHint">প্রয়োজনীয় মাপ দিন।</p>
+<div class="grid" id="dimensionFields"></div>
+<div class="grid" style="margin-top:12px">
+<div><label>মিক্স রেশিও</label><select id="mix"><option value="1:2:4">1 : 2 : 4</option><option value="1:1.5:3">1 : 1.5 : 3</option><option value="1:3:6">1 : 3 : 6</option><option value="1:1:2">1 : 1 : 2</option></select></div>
+<div><label>Dry Volume Factor</label><input id="dryFactor" type="number" value="1.54" min="1" step="any"></div>
+<div><label>অপচয় (%)</label><input id="conWaste" type="number" value="5" min="0"></div>
+<div><label>রডের আনুমানিক হার (% concrete volume)</label><input id="steelPct" type="number" value="0" min="0" step="0.1"></div>
+</div>
+<h3>বাজারদর</h3><div class="grid">
+<div><label>সিমেন্ট ব্যাগ (₹)</label><input id="cementRate" type="number" value="400" min="0"></div>
+<div><label>বালি প্রতি CFT (₹)</label><input id="sandRate" type="number" value="55" min="0"></div>
+<div><label>পাথর প্রতি CFT (₹)</label><input id="stoneRate" type="number" value="65" min="0"></div>
+<div><label>রড প্রতি KG (₹)</label><input id="steelRate" type="number" value="65" min="0"></div>
+</div>
+<div class="actions no-print"><button onclick="calcConcrete()">হিসাব করুন</button><button class="secondary" onclick="resetConcrete()">Reset</button></div><div id="concreteResult" class="result hidden"></div>
+</div></section>
+
+<div class="panel"><h2>Saved হিসাব / Estimate</h2><p class="hint">Save করলে রেকর্ড এই ডিভাইসের ব্রাউজারে থাকবে।</p>
+<div class="actions no-print"><button class="secondary" onclick="saveRecord()">এই হিসাব Save</button><button class="secondary" onclick="showRecords()">রেকর্ড দেখুন</button><button class="secondary" onclick="window.print()">Print / PDF</button><button class="secondary" onclick="exportCSV()">CSV Export</button></div><div id="records"></div></div>
+<p class="footer">সতর্কতা: এটি প্রাথমিক quantity estimator, structural design নয়। RCC slab, column, beam ও footing-এর রডের পরিমাণ এখানে কেবল ব্যবহারকারীর দেওয়া আনুমানিক শতাংশ ধরে হিসাব হয়; এটি bar bending schedule (BBS), reinforcement detailing বা structural design-এর বিকল্প নয়। প্রকৃত রডের ব্যাস, spacing, anchorage, lap, cover, load, soil bearing capacity এবং engineer-approved drawing অনুযায়ী হিসাব করতে হবে। Concrete mix ratio-ও প্রকল্পের specification/design mix অনুযায়ী নির্ধারণ করুন। ১ ব্যাগ সিমেন্ট ≈ ১.২৫ CFT ধরা হয়েছে।</p>
+</main>
+<script>
+let current='wall',lastCalc=null,records=[];try{records=JSON.parse(localStorage.getItem('civilV2Records')||'[]')}catch(e){}
+let openingN=0;
+const $=id=>document.getElementById(id), v=id=>Number($(id).value), fmt=n=>Number(n).toLocaleString('en-IN',{maximumFractionDigits:2});
+function switchKind(k){current=k;document.querySelectorAll('.kind').forEach(x=>x.classList.add('hidden'));document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('active',x.dataset.kind===k));if(k==='wall')$('wall').classList.remove('hidden');else{$('concrete').classList.remove('hidden');configureConcrete(k)}}
+function addOpening(){let d=document.createElement('div');d.className='opening';d.innerHTML=`<div class="grid"><div><label>ধরন</label><select class="otype"><option>দরজা</option><option>জানালা</option><option>অন্যান্য</option></select></div><div><label>সংখ্যা</label><input class="oqty" type="number" min="1" value="1"></div><div><label>প্রস্থ (ফুট)</label><input class="ow" type="number" min="0" value="3"></div><div><label>উচ্চতা (ফুট)</label><input class="oh" type="number" min="0" value="7"></div></div><div class="actions no-print"><button class="danger" onclick="this.closest('.opening').remove()">বাদ দিন</button></div>`;$('openings').appendChild(d)}
+function calcWall(){let h=v('wh'),l=v('wl'),t=v('wt');if(!(h>0&&l>0&&t>0)){alert('সঠিক মাপ দিন');return}
+let gross=h*l*t/12,opening=0;document.querySelectorAll('.opening').forEach(o=>opening+=Number(o.querySelector('.oqty').value)*Number(o.querySelector('.ow').value)*Number(o.querySelector('.oh').value)*t/12);
+let net=Math.max(0,gross-opening),bricks=Math.ceil(net*14.2*(1+v('bwaste')/100)),dryMortar=net*.23*1.33*(1+v('mwaste')/100),p=$('wm').value.split(':').map(Number),cement=dryMortar*p[0]/(p[0]+p[1])/1.25,sand=dryMortar*p[1]/(p[0]+p[1]);
+let cost=bricks/1000*v('brickRate')+cement*v('cementRateW')+sand*v('sandRateW');
+lastCalc={type:'Wall',summary:`${fmt(bricks)} bricks; ${fmt(cement)} cement bags; ${fmt(sand)} CFT sand`,cost};
+$('wallResult').classList.remove('hidden');$('wallResult').innerHTML=`<h3>ফলাফল</h3><div class="metrics">${metric('নেট দেওয়ালের আয়তন',fmt(net)+' CFT')}${metric('ইট (অপচয়সহ)',fmt(bricks)+' টি')}${metric('সিমেন্ট',fmt(cement)+' ব্যাগ')}${metric('বালি',fmt(sand)+' CFT')}</div><table><tr><td>Opening বাদ</td><td>${fmt(opening)} CFT</td></tr><tr><td>আনুমানিক উপকরণ খরচ</td><td class="total">₹${fmt(cost)}</td></tr></table>`}
+function configureConcrete(k){let cfg={
+road:{title:'RCC রাস্তার হিসাব',hint:'দৈর্ঘ্য, চওড়া ও ঢালাইয়ের পুরুত্ব দিন।',fields:[['দৈর্ঘ্য','length','100','ফুট'],['চওড়া','width','12','ফুট'],['পুরুত্ব','thick','6','ইঞ্চি']],ratio:'1:2:4',steel:0},
+pcc:{title:'PCC ঢালাইয়ের হিসাব',hint:'PCC-এর দৈর্ঘ্য, চওড়া ও পুরুত্ব দিন।',fields:[['দৈর্ঘ্য','length','20','ফুট'],['চওড়া','width','10','ফুট'],['পুরুত্ব','thick','4','ইঞ্চি']],ratio:'1:4:8',steel:0},
+slab:{title:'RCC ছাদের হিসাব',hint:'ছাদের দৈর্ঘ্য, চওড়া ও slab thickness দিন।',fields:[['দৈর্ঘ্য','length','20','ফুট'],['চওড়া','width','15','ফুট'],['পুরুত্ব','thick','5','ইঞ্চি']],ratio:'1:1.5:3',steel:1},
+column:{title:'RCC কলামের হিসাব',hint:'একাধিক একই মাপের কলামের মোট quantity দিন।',fields:[['কলামের সংখ্যা','count','4','টি'],['প্রস্থ','width','9','ইঞ্চি'],['দৈর্ঘ্য','length','12','ইঞ্চি'],['উচ্চতা','height','10','ফুট']],ratio:'1:1.5:3',steel:2.5},
+beam:{title:'RCC বিমের হিসাব',hint:'একই মাপের বিমের মোট দৈর্ঘ্য ও সংখ্যা দিন।',fields:[['বিমের সংখ্যা','count','4','টি'],['প্রস্থ','width','9','ইঞ্চি'],['গভীরতা','depth','12','ইঞ্চি'],['প্রতি বিমের দৈর্ঘ্য','length','15','ফুট']],ratio:'1:1.5:3',steel:2},
+footing:{title:'RCC ফুটিংয়ের হিসাব',hint:'একই মাপের footing-এর সংখ্যা, দৈর্ঘ্য, চওড়া ও thickness দিন।',fields:[['ফুটিংয়ের সংখ্যা','count','4','টি'],['দৈর্ঘ্য','length','5','ফুট'],['চওড়া','width','5','ফুট'],['পুরুত্ব','thick','1.5','ফুট']],ratio:'1:1.5:3',steel:0.8}};
+let c=cfg[k];$('concreteTitle').textContent=c.title;$('concreteHint').textContent=c.hint;$('dimensionFields').innerHTML=c.fields.map(f=>`<div><label>${f[0]} (${f[3]})</label><input id="dim_${f[1]}" type="number" min="0" step="any" value="${f[2]}"></div>`).join('');$('mix').innerHTML=['1:2:4','1:1.5:3','1:3:6','1:4:8','1:1:2'].map(x=>`<option ${x===c.ratio?'selected':''}>${x}</option>`).join('');$('steelPct').value=c.steel;$('concreteResult').classList.add('hidden')}
+function metric(a,b){return `<div class="metric"><span>${a}</span><strong>${b}</strong></div>`}
+function concreteVolume(k){let get=n=>Number($('dim_'+n)?.value||0),count=get('count')||1,L=get('length'),W=get('width'),T=get('thick'),H=get('height'),D=get('depth');
+if(k==='road'||k==='pcc'||k==='slab')return L*W*T/12;
+if(k==='column')return count*(W/12)*(L/12)*H;
+if(k==='beam')return count*(W/12)*(D/12)*L;
+if(k==='footing')return count*L*W*T}
+function calcConcrete(){let k=current,wet=concreteVolume(k);if(!(wet>0)){alert('সব মাপ সঠিকভাবে দিন');return}
+let dry=wet*v('dryFactor')*(1+v('conWaste')/100),parts=$('mix').value.split(':').map(Number),sum=parts.reduce((a,b)=>a+b,0),cement=dry*parts[0]/sum/1.25,sand=dry*parts[1]/sum,stone=dry*parts[2]/sum;
+let steelVol=wet*v('steelPct')/100,steelKg=steelVol*1440,cost=cement*v('cementRate')+sand*v('sandRate')+stone*v('stoneRate')+steelKg*v('steelRate');
+lastCalc={type:k.toUpperCase(),summary:`Wet ${fmt(wet)} CFT; cement ${fmt(cement)} bags; sand ${fmt(sand)} CFT; stone ${fmt(stone)} CFT; steel ${fmt(steelKg)} kg`,cost};
+$('concreteResult').classList.remove('hidden');$('concreteResult').innerHTML=`<h3>ফলাফল — ${$('concreteTitle').textContent}</h3><div class="metrics">${metric('Wet Concrete Volume',fmt(wet)+' CFT')}${metric('Dry Volume (wastage সহ)',fmt(dry)+' CFT')}${metric('সিমেন্ট',fmt(cement)+' ব্যাগ')}${metric('বালি',fmt(sand)+' CFT')}${metric('পাথর / Stone Chips',fmt(stone)+' CFT')}${metric('রড (আনুমানিক)',fmt(steelKg)+' KG')}</div><table><tr><td>মিক্স রেশিও</td><td>${$('mix').value}</td></tr><tr><td>আনুমানিক উপকরণ খরচ</td><td class="total">₹${fmt(cost)}</td></tr></table><p class="hint">রডের পরিমাণ কেবল ${v('steelPct')}% অনুমান ধরে দেখানো হয়েছে; প্রকৃত রডের হিসাব structural drawing/BBS থেকে নিতে হবে।</p>`}
+function resetWall(){['wh','wl','bwaste','mwaste'].forEach((id,i)=>$(id).value=['10','20','5','5'][i]);$('wt').value='9';$('wm').value='1:6';$('openings').innerHTML='';$('wallResult').classList.add('hidden');addOpening()}
+function resetConcrete(){configureConcrete(current);$('dryFactor').value='1.54';$('conWaste').value='5'}
+function saveRecord(){if(!lastCalc){alert('আগে হিসাব করুন');return}records.unshift({...lastCalc,date:new Date().toLocaleString()});localStorage.setItem('civilV2Records',JSON.stringify(records));alert('হিসাব সংরক্ষিত হয়েছে')}
+function showRecords(){if(!records.length){$('records').innerHTML='<p class="hint">কোনো রেকর্ড নেই।</p>';return}$('records').innerHTML='<table><tr><th>তারিখ</th><th>কাজ</th><th>হিসাব</th><th>খরচ</th></tr>'+records.map(r=>`<tr><td>${r.date}</td><td>${r.type}</td><td>${r.summary}</td><td>₹${fmt(r.cost)}</td></tr>`).join('')+'</table>'}
+function exportCSV(){if(!records.length){alert('কোনো রেকর্ড নেই');return}let rows=[['Date','Type','Summary','Cost'],...records.map(r=>[r.date,r.type,r.summary,r.cost])],csv=rows.map(r=>r.map(x=>'"'+String(x??'').replaceAll('"','""')+'"').join(',')).join('\n'),a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8'}));a.download='civil-material-records-v2.csv';a.click();URL.revokeObjectURL(a.href)}
+addOpening();switchKind('wall');
+</script></body></html>

@@ -1,0 +1,44 @@
+CIVIL MATERIAL CALCULATOR V2.0 — CLOUD APK BUILD
+=================================================
+
+আপনার Windows 7-এ Android Studio ইনস্টল করা লাগবে না।
+GitHub Actions-এর অনলাইন Linux runner APK build করবে।
+
+যা লাগবে:
+- একটি GitHub account
+- ZIP upload করার মতো browser
+- Android ফোনে APK download/install করার ব্যবস্থা
+
+ধাপ ১: GitHub account
+https://github.com এ গিয়ে account তৈরি করুন বা Sign in করুন।
+
+ধাপ ২: নতুন repository
+GitHub-এ New repository চাপুন।
+Repository name: civil-material-calculator
+Public নির্বাচন করলে GitHub Actions ব্যবহারের সেটআপ সহজ হবে।
+Create repository চাপুন।
+
+ধাপ ৩: ZIP Extract ও upload
+এই ZIP কম্পিউটারে Extract করুন।
+ভেতরের সব ফাইল ও .github folder repository-তে upload করুন।
+GitHub-এর Add file > Upload files দিয়ে সব ফাইল drag/drop করে Commit changes করুন।
+খেয়াল রাখুন .github/workflows/android.yml ফাইলটিও upload হয়েছে।
+
+ধাপ ৪: APK build
+Repository-র Actions tab খুলুন।
+"Build Android APK" workflow বেছে Run workflow চাপুন।
+Build শেষ হওয়া পর্যন্ত অপেক্ষা করুন।
+
+ধাপ ৫: APK download
+সফল workflow run খুলুন।
+Artifacts অংশ থেকে CIVIL-MATERIAL-CALCULATOR-V2-APK ZIP download করুন।
+ZIP Extract করলে app-debug.apk পাবেন।
+
+ধাপ ৬: Android ফোনে install
+APK ফোনে পাঠান।
+APK tap করুন। Android যদি অনুমতি চায়, ওই file manager/browser-এর জন্য Install unknown apps অনুমতি দিন।
+শুধু নিজের তৈরি APK install করুন।
+
+সমস্যা হলে:
+Actions tab-এর failed run খুলে error log-এর screenshot পাঠান।
+কোনো password, OTP বা account recovery code কাউকে দেবেন না।
